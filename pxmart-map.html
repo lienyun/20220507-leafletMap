@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mask map
+    </title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+        integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+        crossorigin="" />
+    <!-- 效能處理 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.css">
+    </link>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css">
+    </link>
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+        integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+        crossorigin=""></script>
+    <!-- markercluster框架 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .marker-cluster-small {
+            background-color: rgba(181, 226, 140, 0.6);
+        }
+
+        .marker-cluster-small div {
+            background-color: rgba(110, 204, 57, 0.6);
+        }
+
+        .marker-cluster-medium {
+            background-color: rgba(241, 211, 87, 0.6);
+        }
+
+        .marker-cluster-medium div {
+            background-color: rgba(240, 194, 12, 0.6);
+        }
+
+        .marker-cluster-large {
+            background-color: rgba(253, 156, 115, 0.6);
+        }
+
+        .marker-cluster-large div {
+            background-color: rgba(241, 128, 23, 0.6);
+        }
+
+        .marker-cluster {
+            background-clip: padding-box;
+            border-radius: 20px;
+        }
+
+        .marker-cluster div {
+            width: 30px;
+            height: 30px;
+            margin-left: 5px;
+            margin-top: 5px;
+
+            text-align: center;
+            border-radius: 15px;
+            font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
+        }
+
+        .marker-cluster span {
+            line-height: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="map" style="width: 100%;"></div>
+
+    <script>
+
+
+
+        var map = L.map('map').setView([25.06108073603067, 121.56835445788387], 13);
+
+        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            maxZoom: 18,
+            id: 'mapbox/streets-v11',
+            tileSize: 512,
+            zoomOffset: -1,
+            accessToken: 'pk.eyJ1IjoibGllbnl1biIsImEiOiJjbDJ2dmhuODYwYWJjM2xudWZoNnMxY3FuIn0.B0pZ7hyXHGk6CxC1DxWr-A'
+        }).addTo(map);
+
+
+
+        var greenIcon = new L.Icon({
+            iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+
+
+        var markers = new L.MarkerClusterGroup().addTo(map);
+
+        //////////////////////////////
+
+        //開啟一個網路請求
+        // var xhr = new XMLHttpRequest();
+
+        //準備要資料
+        // xhr.open("get", "https://raw.githubusercontent.com/kiang/pharmacies/master/json/points.json");
+
+        //執行要資料的動作
+        // xhr.send();
+
+        //當資料回傳時，下方語法就會自動觸發
+        // xhr.onload = function () {
+        //     //ajax撈回來一定是string
+        //     //把資料轉換成物件陣列的JSON格式
+        //     var data = JSON.parse(xhr.responseText).features
+        //     //撈出來
+        //     for (let i = 0; data.length > i; i++) {
+        //         //加上marker並綁上藥局名稱
+        //         markers.addLayer(L.marker([data[i].geometry.coordinates[1], data[i].geometry.coordinates[0]], { icon: greenIcon }).bindPopup(data[i].properties.name));
+        //         // add more markers here...
+        //         // L.marker().addTo(map)
+        //         //   )
+        //     }
+        //     map.addLayer(markers);
+        // }
+
+        ///////////////////////
+        //先寫死
+        var url = "data.json"
+        var request = new XMLHttpRequest();
+        request.open("get", url);
+        request.send(null);
+
+        request.onload = function () {
+
+            var data = JSON.parse(request.responseText)
+
+            markers.addLayer(L.marker([data.latitude, data.longitude], { icon: greenIcon })).bindPopup(`request_processing_time: ${data.request_processing_time} <br> target_processing_time: ${data.target_processing_time} <br> response_processing_time: ${data.response_processing_time}`)
+
+            
+
+        }
+        map.addLayer(markers);
+
+
+    </script>
+
+
+</body>
+
+</html>
