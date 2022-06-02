@@ -117,49 +117,122 @@
         //////////////////////////////
 
         //開啟一個網路請求
-        // var xhr = new XMLHttpRequest();
+        var url = "20220501.json"
+
+        var request = new XMLHttpRequest();
 
         //準備要資料
-        // xhr.open("get", "https://raw.githubusercontent.com/kiang/pharmacies/master/json/points.json");
+        request.open("get", url);
 
         //執行要資料的動作
-        // xhr.send();
-
-        //當資料回傳時，下方語法就會自動觸發
-        // xhr.onload = function () {
-        //     //ajax撈回來一定是string
-        //     //把資料轉換成物件陣列的JSON格式
-        //     var data = JSON.parse(xhr.responseText).features
-        //     //撈出來
-        //     for (let i = 0; data.length > i; i++) {
-        //         //加上marker並綁上藥局名稱
-        //         markers.addLayer(L.marker([data[i].geometry.coordinates[1], data[i].geometry.coordinates[0]], { icon: greenIcon }).bindPopup(data[i].properties.name));
-        //         // add more markers here...
-        //         // L.marker().addTo(map)
-        //         //   )
-        //     }
-        //     map.addLayer(markers);
-        // }
-
-        ///////////////////////
-        //先寫死
-        var url = "data.json"
-        var request = new XMLHttpRequest();
-        request.open("get", url);
         request.send(null);
 
+        //當資料回傳時，下方語法就會自動觸發
         request.onload = function () {
-
+            //ajax撈回來一定是string
+            //把資料轉換成物件陣列的JSON格式
             var data = JSON.parse(request.responseText)
-
-            markers.addLayer(L.marker([data.latitude, data.longitude], { icon: greenIcon })).bindPopup(`request_processing_time: ${data.request_processing_time} <br> target_processing_time: ${data.target_processing_time} <br> response_processing_time: ${data.response_processing_time}`)
-
+            // console.log(data)
             
 
+            let newData = {}
+
+for ( let i = 0; i < data.length; i++) {
+  const longitude = data[i].longitude
+  const latitude = data[i].latitude
+  const key = longitude + '-' + latitude
+
+  // 如果新資料中還沒有
+  if (!newData[key]) {
+    newData[key] = []
+    newData[key].push(data[i])
+  } else {
+    newData[key].push(data[i])
+  }
+}
+
+console.log('newData', newData)
+
+// 遍歷物件的 key，只取 value，並轉成陣列
+const array = Object.values(newData)
+console.log('array', array)
+
+const averageArray = []
+for (let i = 0; i < array.length; i++) {
+
+  const placeArray = array[i]
+  //placeArray是依照位置把它們分組
+  const averageReq = placeArray.reduce((total, item) => Number(item.request_processing_time) + total, 0) / array.length
+  const sumReq = placeArray.reduce((total, item) => Number(item.request_processing_time) + total, 0)
+  const averageTarget = placeArray.reduce((total, item) => Number(item.target_processing_time) + total, 0) / array.length
+  const sumTarget = placeArray.reduce((total, item) => Number(item.target_processing_time) + total, 0)
+  const averageRes = placeArray.reduce((total, item) => Number(item.response_processing_time) + total, 0) / array.length
+  const sumRes = placeArray.reduce((total, item) => Number(item.response_processing_time) + total, 0)
+
+  const result = {
+    longitude: placeArray[0].longitude,
+    latitude: placeArray[0].latitude,
+    averageReq: averageReq,
+    sumReq: sumReq,
+    averageTarget: averageTarget,
+    sumTarget: sumTarget,
+    averageRes: averageRes,
+    sumRes: sumRes
+  }
+  averageArray.push(result)
+}
+console.log('averageArray', averageArray)
+            
+            
+
+for (let j = 0; j < averageArray.length; j++){
+    markers.addLayer(L.marker([averageArray[j].latitude, averageArray[j].longitude], { icon: greenIcon }).bindPopup(`
+    request_processing_time_average: ${averageArray[j].averageReq} <br> 
+    request_processing_time_sum: ${averageArray[j].sumReq} <br>
+    target_processing_time_average: ${averageArray[j].averageTarget} <br> 
+    target_processing_time_sum: ${averageArray[j].sumTarget} <br> 
+    response_processing_time_average: ${averageArray[j].averageRes}<br>
+    response_processing_time_sum: ${averageArray[j].sumRes}<br>
+    `));
+}
+                    
+                        
+
+                        
+                
+                
+            
         }
         map.addLayer(markers);
 
 
+        ///////////////////////
+        //先寫死
+        // var url = "data.json"
+        // var request = new XMLHttpRequest();
+        // request.open("get", url);
+        // request.send(null);
+
+        // request.onload = function () {
+
+        //     var data = JSON.parse(request.responseText)
+
+        //     markers.addLayer(L.marker([data.latitude, data.longitude], { icon: greenIcon })).bindPopup(`request_processing_time: ${data.request_processing_time} <br> target_processing_time: ${data.target_processing_time} <br> response_processing_time: ${data.response_processing_time}`)
+        // }
+        // map.addLayer(markers);
+        
+
+        /////////////////////
+        // var pxMart1 = L.marker([25.05826906989856, 121.56389085645995]).bindPopup('全聯福利中心Pxmart 松山三民'),
+        //     pxMart2 = L.marker([25.059111335926, 121.5547867373085]).bindPopup('全聯福利中心 民生社區店')
+
+        // var pxMart = L.layerGroup([pxMart1, pxMart2]);
+
+        // var overlayMaps = {
+        //     "pxMart": pxMart,
+        // };
+
+        // var layerControl = L.control.layers(overlayMaps).addTo(map);
     </script>
 
 
