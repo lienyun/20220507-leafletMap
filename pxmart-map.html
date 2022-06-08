@@ -1,3 +1,267 @@
+<<<<<<< HEAD
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mask map
+    </title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+        integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+        crossorigin="" />
+    <!-- 效能處理 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.css">
+    </link>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css">
+    </link>
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+        integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+        crossorigin=""></script>
+    <!-- markercluster框架 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .marker-cluster-small {
+            background-color: rgba(181, 226, 140, 0.6);
+        }
+
+        .marker-cluster-small div {
+            background-color: rgba(110, 204, 57, 0.6);
+        }
+
+        .marker-cluster-medium {
+            background-color: rgba(241, 211, 87, 0.6);
+        }
+
+        .marker-cluster-medium div {
+            background-color: rgba(240, 194, 12, 0.6);
+        }
+
+        .marker-cluster-large {
+            background-color: rgba(253, 156, 115, 0.6);
+        }
+
+        .marker-cluster-large div {
+            background-color: rgba(241, 128, 23, 0.6);
+        }
+
+        .marker-cluster {
+            background-clip: padding-box;
+            border-radius: 20px;
+        }
+
+        .marker-cluster div {
+            width: 30px;
+            height: 30px;
+            margin-left: 5px;
+            margin-top: 5px;
+
+            text-align: center;
+            border-radius: 15px;
+            font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
+        }
+
+        .marker-cluster span {
+            line-height: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="map" style="width: 100%;"></div>
+
+    <script>
+
+
+
+        var map = L.map('map').setView([25.06108073603067, 121.56835445788387], 13);
+
+        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            maxZoom: 18,
+            id: 'mapbox/streets-v11',
+            tileSize: 512,
+            zoomOffset: -1,
+            accessToken: 'pk.eyJ1IjoibGllbnl1biIsImEiOiJjbDJ2dmhuODYwYWJjM2xudWZoNnMxY3FuIn0.B0pZ7hyXHGk6CxC1DxWr-A'
+        }).addTo(map);
+
+
+
+        var greenIcon = new L.Icon({
+            iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+
+        var markers = new L.MarkerClusterGroup().addTo(map);
+
+        // var markers20220501 = new L.MarkerClusterGroup().addTo(map);
+        // var markers20220502 = new L.MarkerClusterGroup().addTo(map);
+        // var markers20220503 = new L.MarkerClusterGroup().addTo(map);
+
+
+
+        //////////////////////////////
+
+        //開啟一個網路請求
+        var index = ["01","02","03"]
+    
+        var request = new XMLHttpRequest();
+
+        for (var i = 0; i < index.length; i++) {
+
+var url = "202205" + index[i] + ".json";
+
+let request = new XMLHttpRequest();
+request.open("GET", url);
+request.send(null);
+request.onload = function() {
+    if(request.readyState === XMLHttpRequest.DONE && request.status === 200) {
+        var data = JSON.parse(request.responseText);
+        console.log(data[i]);
+    }
+
+
+let newData = {}
+
+for ( let i = 0; i < data.length; i++) {
+const longitude = data[i].longitude
+const latitude = data[i].latitude
+const key = longitude + '-' + latitude
+
+// 如果新資料中還沒有
+if (!newData[key]) {
+newData[key] = []
+newData[key].push(data[i])
+} else {
+newData[key].push(data[i])
+}
+}
+
+console.log('newData', newData)
+
+// 遍歷物件的 key，只取 value，並轉成陣列
+const array = Object.values(newData)
+console.log('array', array)
+
+const averageArray = []
+for (let j = 0; j < array.length; j++) {
+
+const placeArray = array[i]
+//placeArray是依照位置把它們分組
+const averageReq = placeArray.reduce((total, item) => Number(item.request_processing_time) + total, 0) / array.length
+const sumReq = placeArray.reduce((total, item) => Number(item.request_processing_time) + total, 0)
+const averageTarget = placeArray.reduce((total, item) => Number(item.target_processing_time) + total, 0) / array.length
+const sumTarget = placeArray.reduce((total, item) => Number(item.target_processing_time) + total, 0)
+const averageRes = placeArray.reduce((total, item) => Number(item.response_processing_time) + total, 0) / array.length
+const sumRes = placeArray.reduce((total, item) => Number(item.response_processing_time) + total, 0)
+
+const result = {
+longitude: placeArray[0].longitude,
+latitude: placeArray[0].latitude,
+averageReq: averageReq,
+sumReq: sumReq,
+averageTarget: averageTarget,
+sumTarget: sumTarget,
+averageRes: averageRes,
+sumRes: sumRes
+}
+averageArray.push(result)
+}
+console.log('averageArray', averageArray)
+
+
+for (let m = 0; m < averageArray.length; m++){
+
+markers.addLayer(L.marker([averageArray[0].latitude, averageArray[0].longitude], { icon: greenIcon }).bindPopup(`
+request_processing_time_average: ${averageArray[0].averageReq} <br> 
+request_processing_time_sum: ${averageArray[0].sumReq} <br>
+target_processing_time_average: ${averageArray[0].averageTarget} <br> 
+target_processing_time_sum: ${averageArray[0].sumTarget} <br> 
+response_processing_time_average: ${averageArray[0].averageRes}<br>
+response_processing_time_sum: ${averageArray[0].sumRes}<br>
+`));
+}
+};
+}
+// map.addLayer(markers);
+
+
+        
+//////////////////////////////////////////////////////////////////////////
+
+        // var layer20220501 = L.layerGroup([markers20220501]);
+        // var layer20220502 = L.layerGroup([markers20220502]);
+        // var layer20220503 = L.layerGroup([markers20220503]);
+
+
+
+
+        // var overlayMaps = {
+        //     "20220501": layer20220501,
+        //     "20220502": layer20220502,
+        //     "20220503": layer20220503,
+
+        // };
+
+        // var layerControl = L.control.layers(overlayMaps).addTo(map);
+        // layerControl.addOverlay(layer20220501, "20220501");
+
+        
+
+
+        ///////////////////////
+        //先寫死
+        // var url = "data.json"
+        // var request = new XMLHttpRequest();
+        // request.open("get", url);
+        // request.send(null);
+
+        // request.onload = function () {
+
+        //     var data = JSON.parse(request.responseText)
+
+        //     markers.addLayer(L.marker([data.latitude, data.longitude], { icon: greenIcon })).bindPopup(`request_processing_time: ${data.request_processing_time} <br> target_processing_time: ${data.target_processing_time} <br> response_processing_time: ${data.response_processing_time}`)
+        // }
+        // map.addLayer(markers);
+        
+
+        /////////////////////
+        // var pxMart1 = L.marker([25.05826906989856, 121.56389085645995]).bindPopup('全聯福利中心Pxmart 松山三民'),
+        //     pxMart2 = L.marker([25.059111335926, 121.5547867373085]).bindPopup('全聯福利中心 民生社區店')
+
+        // var pxMart = L.layerGroup([pxMart1, pxMart2]);
+
+        // var overlayMaps = {
+        //     "pxMart": pxMart,
+        // };
+
+        // var layerControl = L.control.layers(overlayMaps).addTo(map);
+    </script>
+
+
+</body>
+
+=======
 <!DOCTYPE html>
 <html lang="en">
 
@@ -238,4 +502,5 @@ for (let j = 0; j < averageArray.length; j++){
 
 </body>
 
+>>>>>>> 19c9d804c4d2399f79f889422fc38cb7114b6afa
 </html>
